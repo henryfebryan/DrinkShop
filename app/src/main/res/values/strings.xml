@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">DrinkShop</string>
+    <string name="app_name">Drink Shop</string>
+    <string name="FACEBOOK_APP_ID">696454147360063</string>
+    <string name="ACCOUNT_KIT_CLIENT_TOKEN">7b53dc3247c45a1f4972c4c51ee755a8</string>
 </resources>

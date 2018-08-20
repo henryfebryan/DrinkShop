@@ -17,4 +17,11 @@
     <dimen name="margin_top_cardview">10dp</dimen>
     <dimen name="font_size_price_drink">12sp</dimen>
     <dimen name="title_drink_name_cardview">18sp</dimen>
+    <dimen name="size_font_cart">20sp</dimen>
+    <dimen name="margin_cart_comment">8dp</dimen>
+    <dimen name="padding_cart_comment">4dp</dimen>
+    <dimen name="margin_cart_scrollview">8dp</dimen>
+    <dimen name="size_font_cart_title_group">20sp</dimen>
+    <dimen name="padding_cart_required">4dp</dimen>
+    <dimen name="padding_cart_title">8dp</dimen>
 </resources>

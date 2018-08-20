@@ -168,6 +168,8 @@ public class MainActivity extends AppCompatActivity{
                                                             public void onResponse(Call<User> call, Response<User> response) {
                                                                 alertDialog.dismiss();
 
+                                                                Common.currentUser = response.body();
+
                                                                 startActivity(new Intent(MainActivity.this, HomeActivity.class));
                                                                 finish();
                                                             }

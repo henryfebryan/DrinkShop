@@ -3,6 +3,8 @@ package dev.henryfebryan.drinkshop;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,7 +23,9 @@ import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import java.util.HashMap;
 import java.util.List;
 
+import dev.henryfebryan.drinkshop.Adapter.CategoryAdapter;
 import dev.henryfebryan.drinkshop.Model.Banner;
+import dev.henryfebryan.drinkshop.Model.Category;
 import dev.henryfebryan.drinkshop.Retrofit.IDrinkShopAPI;
 import dev.henryfebryan.drinkshop.Utils.Common;
 import io.reactivex.Scheduler;
@@ -40,6 +44,8 @@ public class HomeActivity extends AppCompatActivity
 
     IDrinkShopAPI mService;
 
+    RecyclerView lst_menu;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +54,12 @@ public class HomeActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         mService = Common.getAPI();
+
+        lst_menu = (RecyclerView) findViewById(R.id.lst_menu);
+        lst_menu.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false));
+        lst_menu.setHasFixedSize(true);
+
+
         sliderLayout = (SliderLayout) findViewById(R.id.slider);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -77,6 +89,25 @@ public class HomeActivity extends AppCompatActivity
         txt_phone.setText(Common.currentUser.getPhone());
 
         getBannerImage();
+
+        getMenu();
+    }
+
+    private void getMenu() {
+        compositeDisposable.add(mService.getMenu()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<Category>>() {
+                    @Override
+                    public void accept(List<Category> categories) throws Exception {
+                        displayMenu(categories);
+                    }
+                }));
+    }
+
+    private void displayMenu(List<Category> categories) {
+        CategoryAdapter adapter = new CategoryAdapter(this, categories);
+        lst_menu.setAdapter(adapter);
     }
 
     private void getBannerImage() {

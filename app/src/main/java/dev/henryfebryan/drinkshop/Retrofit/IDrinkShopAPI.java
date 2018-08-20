@@ -1,10 +1,15 @@
 package dev.henryfebryan.drinkshop.Retrofit;
 
+import java.util.List;
+
+import dev.henryfebryan.drinkshop.Model.Banner;
 import dev.henryfebryan.drinkshop.Model.CheckUserResponse;
 import dev.henryfebryan.drinkshop.Model.User;
+import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 public interface IDrinkShopAPI {
@@ -21,4 +26,8 @@ public interface IDrinkShopAPI {
     @FormUrlEncoded
     @POST("getuser.php")
     Call<User> getUserInformation(@Field("phone") String phone);
+
+    @GET("getbanner.php")
+    Observable<List<Banner>> getBanners();
+
 }

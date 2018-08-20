@@ -8,10 +8,9 @@ import android.widget.TextView;
 import dev.henryfebryan.drinkshop.Interface.IItemClickListener;
 import dev.henryfebryan.drinkshop.R;
 
-public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-
+public class DrinkViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
     ImageView img_product;
-    TextView txt_menu_name;
+    TextView txt_drink_name, txt_price;
 
     IItemClickListener itemClickListener;
 
@@ -19,11 +18,12 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.
         this.itemClickListener = itemClickListener;
     }
 
-    public CategoryViewHolder(View itemView) {
+    public DrinkViewHolder(View itemView) {
         super(itemView);
 
         img_product = (ImageView) itemView.findViewById(R.id.image_product);
-        txt_menu_name = (TextView) itemView.findViewById(R.id.txt_menu_name);
+        txt_drink_name = (TextView) itemView.findViewById(R.id.txt_drink_name);
+        txt_price = (TextView) itemView.findViewById(R.id.txt_price);
 
         itemView.setOnClickListener(this);
     }

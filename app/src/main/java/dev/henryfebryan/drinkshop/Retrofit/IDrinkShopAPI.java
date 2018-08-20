@@ -5,6 +5,7 @@ import java.util.List;
 import dev.henryfebryan.drinkshop.Model.Banner;
 import dev.henryfebryan.drinkshop.Model.Category;
 import dev.henryfebryan.drinkshop.Model.CheckUserResponse;
+import dev.henryfebryan.drinkshop.Model.Drink;
 import dev.henryfebryan.drinkshop.Model.User;
 import io.reactivex.Observable;
 import retrofit2.Call;
@@ -33,4 +34,8 @@ public interface IDrinkShopAPI {
 
     @GET("getmenu.php")
     Observable<List<Category>> getMenu();
+
+    @FormUrlEncoded
+    @POST("getdrink.php")
+    Observable<List<Drink>> getDrink(@Field("menuid") String menuID);
 }

@@ -11,4 +11,10 @@
     <dimen name="corner_radius_cardview">8dp</dimen>
     <dimen name="padding_cardview">5dp</dimen>
     <dimen name="size_font_title_cardview">16sp</dimen>
+    <dimen name="size_font_banner_title_drink">30sp</dimen>
+    <dimen name="margin_left_banner_title_drink">20dp</dimen>
+    <dimen name="margin_recycler_drink">8dp</dimen>
+    <dimen name="margin_top_cardview">10dp</dimen>
+    <dimen name="font_size_price_drink">12sp</dimen>
+    <dimen name="title_drink_name_cardview">18sp</dimen>
 </resources>

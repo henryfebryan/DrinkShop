@@ -59,7 +59,6 @@ public class HomeActivity extends AppCompatActivity
         lst_menu.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false));
         lst_menu.setHasFixedSize(true);
 
-
         sliderLayout = (SliderLayout) findViewById(R.id.slider);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

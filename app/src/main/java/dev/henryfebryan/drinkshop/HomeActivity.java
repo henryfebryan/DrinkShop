@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import dev.henryfebryan.drinkshop.Adapter.CategoryAdapter;
+import dev.henryfebryan.drinkshop.Database.DataSource.CartRepository;
+import dev.henryfebryan.drinkshop.Database.Local.CartDataSource;
+import dev.henryfebryan.drinkshop.Database.Local.CartDatabase;
 import dev.henryfebryan.drinkshop.Model.Banner;
 import dev.henryfebryan.drinkshop.Model.Category;
 import dev.henryfebryan.drinkshop.Model.Drink;
@@ -93,6 +96,13 @@ public class HomeActivity extends AppCompatActivity
         getMenu();
 
         getToppingList();
+
+        initDB();
+    }
+
+    private void initDB() {
+        Common.cartDatabase = CartDatabase.getInstance(this);
+        Common.cartRepository = CartRepository.getInstance(CartDataSource.getInstance(Common.cartDatabase.cartDAO()));
     }
 
     private void getToppingList() {

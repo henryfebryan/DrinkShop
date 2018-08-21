@@ -26,6 +26,7 @@ import java.util.List;
 import dev.henryfebryan.drinkshop.Adapter.CategoryAdapter;
 import dev.henryfebryan.drinkshop.Model.Banner;
 import dev.henryfebryan.drinkshop.Model.Category;
+import dev.henryfebryan.drinkshop.Model.Drink;
 import dev.henryfebryan.drinkshop.Retrofit.IDrinkShopAPI;
 import dev.henryfebryan.drinkshop.Utils.Common;
 import io.reactivex.Scheduler;
@@ -90,6 +91,20 @@ public class HomeActivity extends AppCompatActivity
         getBannerImage();
 
         getMenu();
+
+        getToppingList();
+    }
+
+    private void getToppingList() {
+        compositeDisposable.add(mService.getDrink(Common.TOPPING_MENU_ID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<Drink>>() {
+                    @Override
+                    public void accept(List<Drink> drinks) throws Exception {
+                        Common.toppingList = drinks;
+                    }
+                }));
     }
 
     private void getMenu() {

@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.henryfebryan.drinkshop.Database.DataSource.CartRepository;
-import dev.henryfebryan.drinkshop.Database.Local.CartDatabase;
+import dev.henryfebryan.drinkshop.Database.DataSource.FavoriteRepository;
+import dev.henryfebryan.drinkshop.Database.Local.DrinkRoomDatabase;
 import dev.henryfebryan.drinkshop.Model.Category;
 import dev.henryfebryan.drinkshop.Model.Drink;
 import dev.henryfebryan.drinkshop.Model.User;
@@ -30,8 +31,10 @@ public class Common {
     public static int ice = -1;
 
     //Database
-    public static CartDatabase cartDatabase;
+    public static DrinkRoomDatabase drinkRoomDatabase;
     public static CartRepository cartRepository;
+    public static FavoriteRepository favoriteRepository;
+
 
     public static IDrinkShopAPI getAPI(){
         return RetrofitClient.getClient(BASE_URL).create(IDrinkShopAPI.class);

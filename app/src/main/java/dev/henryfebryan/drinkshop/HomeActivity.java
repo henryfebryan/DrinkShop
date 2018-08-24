@@ -40,8 +40,10 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.henryfebryan.drinkshop.Adapter.CategoryAdapter;
 import dev.henryfebryan.drinkshop.Database.DataSource.CartRepository;
+import dev.henryfebryan.drinkshop.Database.DataSource.FavoriteRepository;
 import dev.henryfebryan.drinkshop.Database.Local.CartDataSource;
-import dev.henryfebryan.drinkshop.Database.Local.CartDatabase;
+import dev.henryfebryan.drinkshop.Database.Local.DrinkRoomDatabase;
+import dev.henryfebryan.drinkshop.Database.Local.FavoriteDataSource;
 import dev.henryfebryan.drinkshop.Model.Banner;
 import dev.henryfebryan.drinkshop.Model.Category;
 import dev.henryfebryan.drinkshop.Model.Drink;
@@ -206,8 +208,9 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void initDB() {
-        Common.cartDatabase = CartDatabase.getInstance(this);
-        Common.cartRepository = CartRepository.getInstance(CartDataSource.getInstance(Common.cartDatabase.cartDAO()));
+        Common.drinkRoomDatabase = DrinkRoomDatabase.getInstance(this);
+        Common.cartRepository = CartRepository.getInstance(CartDataSource.getInstance(Common.drinkRoomDatabase.cartDAO()));
+        Common.favoriteRepository = FavoriteRepository.getInstance(FavoriteDataSource.getInstance(Common.drinkRoomDatabase.favoriteDAO()));
     }
 
     private void getToppingList() {

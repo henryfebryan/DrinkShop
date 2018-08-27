@@ -24,6 +24,4 @@ public abstract class DrinkRoomDatabase extends RoomDatabase {
         return instance;
     }
 
-
-
 }

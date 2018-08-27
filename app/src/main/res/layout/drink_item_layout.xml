@@ -51,14 +51,28 @@
                 android:textSize="@dimen/font_size_price_drink" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btn_add_cart"
-            android:text="@string/add_to_cart"
-            android:layout_gravity="center_horizontal"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <ImageView
+                android:id="@+id/btn_add_cart"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_shopping_cart_black_24dp"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:id="@+id/btn_favorite"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_favorite_border_black_24dp"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
     </LinearLayout>
 
 </android.support.v7.widget.CardView>

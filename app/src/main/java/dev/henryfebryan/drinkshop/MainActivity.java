@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity{
             case REQUEST_PERMISSION:
             {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText( this, "Permission granted", Toast.LENGTH_SHORT).show();
                 else
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
             }

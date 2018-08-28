@@ -32,8 +32,6 @@ public class FavoriteListActivity extends AppCompatActivity implements RecyclerI
     FavoriteAdapter favoriteAdapter;
     List<Favorite> localFavorites = new ArrayList<>();
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

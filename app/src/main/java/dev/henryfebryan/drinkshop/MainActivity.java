@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity{
 
                 @Override
                 public void onError(AccountKitError accountKitError) {
-                    Log.d("ERROR",accountKitError.getErrorType().getMessage());
+                    Log.d("ERROR0",accountKitError.toString());
                     Toast.makeText(MainActivity.this, ""+accountKitError.getErrorType().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity{
 
                         @Override
                         public void onError(AccountKitError accountKitError) {
-                            Log.d("ERROR",accountKitError.getErrorType().getMessage());
+                            Log.d("ERROR0",accountKitError.toString());
                             Toast.makeText(MainActivity.this, ""+accountKitError.getErrorType().getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });

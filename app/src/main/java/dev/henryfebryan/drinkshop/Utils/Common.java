@@ -11,10 +11,12 @@ import dev.henryfebryan.drinkshop.Model.Drink;
 import dev.henryfebryan.drinkshop.Model.User;
 import dev.henryfebryan.drinkshop.Retrofit.IDrinkShopAPI;
 import dev.henryfebryan.drinkshop.Retrofit.RetrofitClient;
+import dev.henryfebryan.drinkshop.Retrofit.RetrofitScalarsClient;
 
 public class Common {
     //in Emulator , localhost = 10.0.2.2
     public static final String BASE_URL = "http://10.0.2.2/drinkshop/";
+    public static final String API_TOKEN_URL = "http://10.0.2.2/drinkshop/braintree/main.php";
 
     public static final String TOPPING_MENU_ID = "7";
 
@@ -38,5 +40,9 @@ public class Common {
 
     public static IDrinkShopAPI getAPI(){
         return RetrofitClient.getClient(BASE_URL).create(IDrinkShopAPI.class);
+    }
+
+    public static IDrinkShopAPI getScalarsAPI(){
+        return RetrofitScalarsClient.getScalarsClient(BASE_URL).create(IDrinkShopAPI.class);
     }
 }

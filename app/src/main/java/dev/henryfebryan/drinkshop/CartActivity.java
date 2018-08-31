@@ -127,63 +127,82 @@ public class CartActivity extends AppCompatActivity implements RecyclerItemTouch
     }
 
     private void placeOrder() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Submit Order");
+        if(Common.currentUser != null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Submit Order");
 
-        View submit_order_layout = LayoutInflater.from(this).inflate(R.layout.submit_order_layout,null);
+            View submit_order_layout = LayoutInflater.from(this).inflate(R.layout.submit_order_layout, null);
 
-        final EditText edt_comment = (EditText) submit_order_layout.findViewById(R.id.edt_comment);
-        final EditText edt_other_address = (EditText) submit_order_layout.findViewById(R.id.edt_other_address);
+            final EditText edt_comment = (EditText) submit_order_layout.findViewById(R.id.edt_comment);
+            final EditText edt_other_address = (EditText) submit_order_layout.findViewById(R.id.edt_other_address);
 
-        final RadioButton rdi_user_address = (RadioButton) submit_order_layout.findViewById(R.id.rdi_user_address);
-        final RadioButton rdi_other_address = (RadioButton) submit_order_layout.findViewById(R.id.rdi_other_address);
+            final RadioButton rdi_user_address = (RadioButton) submit_order_layout.findViewById(R.id.rdi_user_address);
+            final RadioButton rdi_other_address = (RadioButton) submit_order_layout.findViewById(R.id.rdi_other_address);
 
-        rdi_user_address.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    edt_other_address.setEnabled(false);
+            rdi_user_address.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        edt_other_address.setEnabled(false);
+                    }
                 }
-            }
-        });
-        rdi_other_address.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    edt_other_address.setEnabled(true);
+            });
+            rdi_other_address.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        edt_other_address.setEnabled(true);
+                    }
                 }
-            }
-        });
+            });
 
-        builder.setView(submit_order_layout);
-        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        }).setPositiveButton("SUBMIT", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                orderComment = edt_comment.getText().toString();
-                if(rdi_user_address.isChecked()){
-                    orderAddress = Common.currentUser.getAddress();
+            builder.setView(submit_order_layout);
+            builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
                 }
-                else if(rdi_other_address.isChecked()) {
-                    orderAddress = edt_other_address.getText().toString();
-                }
-                else {
-                    orderAddress="";
-                }
+            }).setPositiveButton("SUBMIT", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    orderComment = edt_comment.getText().toString();
+                    if (rdi_user_address.isChecked()) {
+                        orderAddress = Common.currentUser.getAddress();
+                    } else if (rdi_other_address.isChecked()) {
+                        orderAddress = edt_other_address.getText().toString();
+                    } else {
+                        orderAddress = "";
+                    }
 
-                //payment
-                Log.d("TOKEN",token);
-                DropInRequest dropInRequest = new DropInRequest().clientToken(token);
-                startActivityForResult(dropInRequest.getIntent(CartActivity.this),PAYMENT_REQUEST_CODE);
+                    //payment
+                    DropInRequest dropInRequest = new DropInRequest().clientToken(token);
+                    Log.d("TOKEN", token);
+                    startActivityForResult(dropInRequest.getIntent(CartActivity.this), PAYMENT_REQUEST_CODE);
 
 
-            }
-        });
-        builder.show();
+                }
+            });
+            builder.show();
+        }else {
+            //require login
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Not Login ?");
+            builder.setMessage("Please login or register account to submit order");
+            builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    startActivity(new Intent(CartActivity.this, MainActivity.class));
+                    finish();
+                }
+            });
+            builder.show();
+        }
     }
 
     private void sendOrderToServer(float sumPrice, List<Cart> carts, String orderComment, String orderAddress) {
@@ -197,6 +216,7 @@ public class CartActivity extends AppCompatActivity implements RecyclerItemTouch
                         public void onResponse(Call<String> call, Response<String> response) {
                             Toast.makeText(CartActivity.this, "Order Submit", Toast.LENGTH_SHORT).show();
                             Common.cartRepository.emptyCart();
+                            finish();
                         }
 
                         @Override

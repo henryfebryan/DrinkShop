@@ -8,6 +8,7 @@ import dev.henryfebryan.drinkshop.Database.DataSource.FavoriteRepository;
 import dev.henryfebryan.drinkshop.Database.Local.DrinkRoomDatabase;
 import dev.henryfebryan.drinkshop.Model.Category;
 import dev.henryfebryan.drinkshop.Model.Drink;
+import dev.henryfebryan.drinkshop.Model.Order;
 import dev.henryfebryan.drinkshop.Model.User;
 import dev.henryfebryan.drinkshop.Retrofit.IDrinkShopAPI;
 import dev.henryfebryan.drinkshop.Retrofit.RetrofitClient;
@@ -22,6 +23,7 @@ public class Common {
 
     public static User currentUser = null;
     public static Category currentCategory = null;
+    public static Order currentOrder=null;
 
     public static List<Drink> toppingList = new ArrayList<>();
 

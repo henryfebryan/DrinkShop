@@ -459,9 +459,19 @@ public class HomeActivity extends AppCompatActivity
 
             builder.show();
         } else if (id == R.id.nav_favorite) {
-            startActivity(new Intent(HomeActivity.this, FavoriteListActivity.class));
+            if(Common.currentUser != null){
+                startActivity(new Intent(HomeActivity.this, FavoriteListActivity.class));
+            }
+            else {
+                Toast.makeText(this, "Please login to use this features", Toast.LENGTH_SHORT).show();
+            }
         } else if (id == R.id.nav_show_orders) {
-            startActivity(new Intent(HomeActivity.this, ShowOrderActivity.class));
+            if(Common.currentUser != null){
+                startActivity(new Intent(HomeActivity.this, ShowOrderActivity.class));
+            }
+            else {
+                Toast.makeText(this, "Please login to use this features", Toast.LENGTH_SHORT).show();
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

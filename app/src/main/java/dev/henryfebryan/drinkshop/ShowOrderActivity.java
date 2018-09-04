@@ -32,6 +32,8 @@ public class ShowOrderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_order);
 
+
+
         mService = Common.getAPI();
 
         recycler_orders = (RecyclerView) findViewById(R.id.recycler_orders);

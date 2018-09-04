@@ -6,6 +6,7 @@ import dev.henryfebryan.drinkshop.Model.Banner;
 import dev.henryfebryan.drinkshop.Model.Category;
 import dev.henryfebryan.drinkshop.Model.CheckUserResponse;
 import dev.henryfebryan.drinkshop.Model.Drink;
+import dev.henryfebryan.drinkshop.Model.Order;
 import dev.henryfebryan.drinkshop.Model.User;
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
@@ -62,4 +63,11 @@ public interface IDrinkShopAPI {
     @POST("braintree/checkout.php")
     Call<String> payment(@Field("nonce") String nonce,
                              @Field("amount") String amount);
+
+    @FormUrlEncoded
+    @POST("getorder.php")
+    Observable<List<Order>> getOrder(@Field("userPhone") String userPhone,
+                                     @Field("status") String status);
+
+
 }

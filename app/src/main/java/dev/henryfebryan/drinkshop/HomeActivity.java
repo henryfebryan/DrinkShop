@@ -443,6 +443,9 @@ public class HomeActivity extends AppCompatActivity
         else if(id == R.id.nav_favorite){
             startActivity(new Intent(HomeActivity.this, FavoriteListActivity.class));
         }
+        else if(id == R.id.nav_show_orders){
+            startActivity(new Intent(HomeActivity.this, ShowOrderActivity.class));
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

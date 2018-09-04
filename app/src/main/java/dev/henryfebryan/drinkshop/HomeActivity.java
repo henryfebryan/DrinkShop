@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -87,6 +88,8 @@ public class HomeActivity extends AppCompatActivity
 
     Uri selectedFileUri;
 
+    SwipeRefreshLayout swipeRefreshLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +98,8 @@ public class HomeActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         mService = Common.getAPI();
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh);
 
         lst_menu = (RecyclerView) findViewById(R.id.lst_menu);
         lst_menu.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -134,35 +139,32 @@ public class HomeActivity extends AppCompatActivity
             }
         });
 
-        if (Common.currentUser != null){ //if not login, currentUser null
-            //Set Info
-            txt_name.setText(Common.currentUser.getName());
-            txt_phone.setText(Common.currentUser.getPhone());
-
-            if (!TextUtils.isEmpty(Common.currentUser.getAvatarUrl())) {
-                Picasso.with(this)
-                        .load(new StringBuilder(Common.BASE_URL)
-                                .append("user_avatar/")
-                                .append(Common.currentUser.getAvatarUrl()).toString())
-                        .into(img_avatar);
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                getBannerImage();
+                getMenu();
+                getToppingList();
             }
-        }
-        getBannerImage();
+        });
 
-        getMenu();
-
-        getToppingList();
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(true);
+                getBannerImage();
+                getMenu();
+                getToppingList();
+            }
+        });
 
         initDB();
-
         checkSessionLogin();//if user logged,  login again(session still live)
     }
 
     private void checkSessionLogin() {
-        if(AccountKit.getCurrentAccessToken() != null){
-            final AlertDialog dialog = new SpotsDialog(this);
-            dialog.show();
-            dialog.setMessage("Please waiting...");
+        if (AccountKit.getCurrentAccessToken() != null) {
+            swipeRefreshLayout.setRefreshing(true);
 
             AccountKit.getCurrentAccount(new AccountKitCallback<Account>() {
                 @Override
@@ -172,25 +174,35 @@ public class HomeActivity extends AppCompatActivity
                                 @Override
                                 public void onResponse(Call<CheckUserResponse> call, Response<CheckUserResponse> response) {
                                     CheckUserResponse userResponse = response.body();
-                                    if(userResponse.isExists()){
+                                    if (userResponse.isExists()) {
                                         mService.getUserInformation(account.getPhoneNumber().toString())
                                                 .enqueue(new Callback<User>() {
                                                     @Override
                                                     public void onResponse(Call<User> call, Response<User> response) {
                                                         Common.currentUser = response.body();
-                                                        if(Common.currentUser != null){
-                                                            dialog.dismiss();
+                                                        if (Common.currentUser != null) {
+                                                            swipeRefreshLayout.setRefreshing(false);
+                                                            //Set Info
+                                                            txt_name.setText(Common.currentUser.getName());
+                                                            txt_phone.setText(Common.currentUser.getPhone());
+
+                                                            if (!TextUtils.isEmpty(Common.currentUser.getAvatarUrl())) {
+                                                                Picasso.with(getBaseContext())
+                                                                        .load(new StringBuilder(Common.BASE_URL)
+                                                                                .append("user_avatar/")
+                                                                                .append(Common.currentUser.getAvatarUrl()).toString())
+                                                                        .into(img_avatar);
+                                                            }
                                                         }
                                                     }
 
                                                     @Override
                                                     public void onFailure(Call<User> call, Throwable t) {
-                                                        dialog.dismiss();
-                                                        Log.d("ERRORUser",t.getMessage());
+                                                        swipeRefreshLayout.setRefreshing(false);
+                                                        Log.d("ERRORUser", t.getMessage());
                                                     }
                                                 });
-                                    }
-                                    else {
+                                    } else {
                                         //if user not exist on db, ->login
                                         startActivity(new Intent(HomeActivity.this, MainActivity.class));
                                         finish();
@@ -199,31 +211,37 @@ public class HomeActivity extends AppCompatActivity
 
                                 @Override
                                 public void onFailure(Call<CheckUserResponse> call, Throwable t) {
-                                    Log.d("ErrorCheckExist",t.getMessage());
+                                    Log.d("ErrorCheckExist", t.getMessage());
                                 }
                             });
                 }
 
                 @Override
                 public void onError(AccountKitError accountKitError) {
-                    Log.d("ErrorAccountKit",accountKitError.getErrorType().getMessage());
+                    Log.d("ErrorAccountKit", accountKitError.getErrorType().getMessage());
                 }
             });
+        } else {
+            AccountKit.logOut();
+
+            Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == Activity.RESULT_OK){
-            if(requestCode == PICK_FILE_REQUEST){
-                if(data != null){
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == PICK_FILE_REQUEST) {
+                if (data != null) {
                     selectedFileUri = data.getData();
-                    if(selectedFileUri != null && !selectedFileUri.getPath().isEmpty()){
+                    if (selectedFileUri != null && !selectedFileUri.getPath().isEmpty()) {
                         img_avatar.setImageURI(selectedFileUri);
                         uploadFile();
-                    }
-                    else {
+                    } else {
                         Toast.makeText(this, "Cannot upload file to server", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -232,7 +250,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void uploadFile() {
-        if(selectedFileUri!=null){
+        if (selectedFileUri != null) {
             File file = FileUtils.getFile(this, selectedFileUri);
 
             String filename = new StringBuilder(Common.currentUser.getPhone())
@@ -241,16 +259,16 @@ public class HomeActivity extends AppCompatActivity
 
             Log.d("FILE", file.toString());
 
-            ProgressRequestBody requestFile = new ProgressRequestBody(file,this);
+            ProgressRequestBody requestFile = new ProgressRequestBody(file, this);
 
-            final MultipartBody.Part body = MultipartBody.Part.createFormData("uploaded_file",filename,requestFile);
+            final MultipartBody.Part body = MultipartBody.Part.createFormData("uploaded_file", filename, requestFile);
 
-            final MultipartBody.Part userPhone = MultipartBody.Part.createFormData("phone",Common.currentUser.getPhone());
+            final MultipartBody.Part userPhone = MultipartBody.Part.createFormData("phone", Common.currentUser.getPhone());
 
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    mService.uploadFile(userPhone,body)
+                    mService.uploadFile(userPhone, body)
                             .enqueue(new Callback<String>() {
                                 @Override
                                 public void onResponse(Call<String> call, Response<String> response) {
@@ -268,7 +286,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void chooseImage() {
-        startActivityForResult(Intent.createChooser(FileUtils.createGetContentIntent(),"Select a file"),
+        startActivityForResult(Intent.createChooser(FileUtils.createGetContentIntent(), "Select a file"),
                 PICK_FILE_REQUEST);
     }
 
@@ -305,18 +323,20 @@ public class HomeActivity extends AppCompatActivity
     private void displayMenu(List<Category> categories) {
         CategoryAdapter adapter = new CategoryAdapter(this, categories);
         lst_menu.setAdapter(adapter);
+
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private void getBannerImage() {
         compositeDisposable.add(mService.getBanners()
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Consumer<List<Banner>>() {
-            @Override
-            public void accept(List<Banner> banners) throws Exception {
-                displayImage(banners);
-            }
-        }));
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<Banner>>() {
+                    @Override
+                    public void accept(List<Banner> banners) throws Exception {
+                        displayImage(banners);
+                    }
+                }));
     }
 
     @Override
@@ -326,13 +346,13 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void displayImage(List<Banner> banners) {
-        HashMap<String,String> bannerMap = new HashMap<>();
-        for(Banner item:banners){
+        HashMap<String, String> bannerMap = new HashMap<>();
+        for (Banner item : banners) {
             bannerMap.put(item.getName(), item.getLink());
         }
 
-        for(String name:bannerMap.keySet()){
-            TextSliderView  textSliderView = new TextSliderView(this);
+        for (String name : bannerMap.keySet()) {
+            TextSliderView textSliderView = new TextSliderView(this);
             textSliderView.description(name)
                     .image(bannerMap.get(name))
                     .setScaleType(BaseSliderView.ScaleType.Fit);
@@ -348,11 +368,11 @@ public class HomeActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if(isBackButtonClicked){
+            if (isBackButtonClicked) {
                 super.onBackPressed();
                 return;
             }
-            this.isBackButtonClicked=true;
+            this.isBackButtonClicked = true;
             Toast.makeText(this, "Please click back again to exit", Toast.LENGTH_SHORT).show();
         }
     }
@@ -363,7 +383,7 @@ public class HomeActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.menu_action_bar, menu);
         View view = menu.findItem(R.id.cart_menu).getActionView();
         badge = (NotificationBadge) view.findViewById(R.id.badge);
-        cart_icon =(ImageView) view.findViewById(R.id.cart_icon);
+        cart_icon = (ImageView) view.findViewById(R.id.cart_icon);
         cart_icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -375,13 +395,13 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void updateCartCount() {
-        if(badge == null) return;
+        if (badge == null) return;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(Common.cartRepository.countCartItems() == 0 ){
+                if (Common.cartRepository.countCartItems() == 0) {
                     badge.setVisibility(View.INVISIBLE);
-                }else {
+                } else {
                     badge.setVisibility(View.VISIBLE);
                     badge.setText(String.valueOf(Common.cartRepository.countCartItems()));
                 }
@@ -399,8 +419,7 @@ public class HomeActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.cart_menu) {
             return true;
-        }
-        else if (id == R.id.search_menu) {
+        } else if (id == R.id.search_menu) {
             startActivity(new Intent(HomeActivity.this, SearchActivity.class));
             return true;
         }
@@ -439,11 +458,9 @@ public class HomeActivity extends AppCompatActivity
             });
 
             builder.show();
-        }
-        else if(id == R.id.nav_favorite){
+        } else if (id == R.id.nav_favorite) {
             startActivity(new Intent(HomeActivity.this, FavoriteListActivity.class));
-        }
-        else if(id == R.id.nav_show_orders){
+        } else if (id == R.id.nav_show_orders) {
             startActivity(new Intent(HomeActivity.this, ShowOrderActivity.class));
         }
 
@@ -456,7 +473,7 @@ public class HomeActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         updateCartCount();
-        isBackButtonClicked=false;
+        isBackButtonClicked = false;
     }
 
     @Override

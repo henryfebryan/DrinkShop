@@ -1,5 +1,6 @@
 package dev.henryfebryan.drinkshop;
 
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -30,6 +31,8 @@ public class DrinkActivity extends AppCompatActivity {
 
     TextView txt_banner_name;
 
+    SwipeRefreshLayout swipeRefreshLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +40,22 @@ public class DrinkActivity extends AppCompatActivity {
         initService();
         initView();
         setCategoryTitle();
-        loadListDrink(Common.currentCategory.ID);
+
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(true);
+                loadListDrink(Common.currentCategory.ID);
+            }
+        });
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(true);
+                loadListDrink(Common.currentCategory.ID);
+            }
+        });
     }
 
     private void setCategoryTitle() {
@@ -59,10 +77,14 @@ public class DrinkActivity extends AppCompatActivity {
     private void displayDrinkList(List<Drink> drinks) {
         DrinkAdapter adapter = new DrinkAdapter(this,drinks);
         lst_drink.setAdapter(adapter);
+
+        swipeRefreshLayout.setRefreshing(false);
     }
 
 
     private void initView() {
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_to_refresh);
+
         txt_banner_name = (TextView) findViewById(R.id.txt_menu_name);
 
         lst_drink = (RecyclerView) findViewById(R.id.recycler_drinks);

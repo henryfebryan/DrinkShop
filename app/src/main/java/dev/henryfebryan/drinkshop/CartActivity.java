@@ -175,7 +175,7 @@ public class CartActivity extends AppCompatActivity implements RecyclerItemTouch
                     }
 
                     //payment
-                    DropInRequest dropInRequest = new DropInRequest().clientToken(token);
+                    DropInRequest dropInRequest = new DropInRequest().clientToken("sandbox_z38zgf98_d5nmcbkhfszypcyv");
                     Log.d("TOKEN", token);
                     startActivityForResult(dropInRequest.getIntent(CartActivity.this), PAYMENT_REQUEST_CODE);
 

@@ -65,7 +65,6 @@ public class ShowOrderActivity extends AppCompatActivity {
 
         loadOrder("0");
     }
-
     private void loadOrder(String statusCode) {
         if(Common.currentUser != null) {
             compositeDisposable.add(
@@ -86,16 +85,15 @@ public class ShowOrderActivity extends AppCompatActivity {
             finish();
         }
     }
-
     private void displayOrder(List<Order> orders) {
         OrderAdapter adapter = new OrderAdapter(this, orders);
         recycler_orders.setAdapter(adapter);
     }
-
     @Override
     protected void onResume() {
         super.onResume();
         loadOrder("0");
+        bottomNavigationView.setSelectedItemId(R.id.order_new);
     }
 
     @Override

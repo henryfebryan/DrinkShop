@@ -472,6 +472,8 @@ public class HomeActivity extends AppCompatActivity
             else {
                 Toast.makeText(this, "Please login to use this features", Toast.LENGTH_SHORT).show();
             }
+        } else if (id == R.id.nav_nearby_store) {
+            startActivity(new Intent(HomeActivity.this, NearbyStore.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

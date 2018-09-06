@@ -7,6 +7,7 @@ import dev.henryfebryan.drinkshop.Model.Category;
 import dev.henryfebryan.drinkshop.Model.CheckUserResponse;
 import dev.henryfebryan.drinkshop.Model.Drink;
 import dev.henryfebryan.drinkshop.Model.Order;
+import dev.henryfebryan.drinkshop.Model.Store;
 import dev.henryfebryan.drinkshop.Model.User;
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
@@ -79,4 +80,9 @@ public interface IDrinkShopAPI {
     @POST("cancelorder.php")
     Call<String> cancelOrder(@Field("orderId") String orderId,
                              @Field("userPhone") String userPhone);
+
+    @FormUrlEncoded
+    @POST("getnearbystore.php")
+    Observable<List<Store>> getNearbyStore(@Field("lat") String lat,
+                                           @Field("lng") String lng);
 }

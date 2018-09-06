@@ -2,6 +2,7 @@ package dev.henryfebryan.drinkshop;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -19,6 +20,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.karumi.dexter.Dexter;
@@ -29,6 +31,14 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.util.List;
 
+import dev.henryfebryan.drinkshop.Model.Store;
+import dev.henryfebryan.drinkshop.Retrofit.IDrinkShopAPI;
+import dev.henryfebryan.drinkshop.Utils.Common;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 public class NearbyStore extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -36,6 +46,11 @@ public class NearbyStore extends FragmentActivity implements OnMapReadyCallback 
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationCallback locationCallback;
     LocationRequest locationRequest;
+
+    IDrinkShopAPI mService;
+
+    CompositeDisposable compositeDisposable = new CompositeDisposable();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +59,9 @@ public class NearbyStore extends FragmentActivity implements OnMapReadyCallback 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        mService = Common.getAPI();
+
         Dexter.withActivity(this)
                 .withPermissions(Manifest.permission.ACCESS_COARSE_LOCATION,
                         Manifest.permission.ACCESS_FINE_LOCATION)
@@ -80,6 +98,8 @@ public class NearbyStore extends FragmentActivity implements OnMapReadyCallback 
                 LatLng your_location = new LatLng(locationResult.getLastLocation().getLatitude(),locationResult.getLastLocation().getLongitude());
                 mMap.addMarker(new MarkerOptions().position(your_location).title("Your Location"));
                 mMap.animateCamera(CameraUpdateFactory. newLatLngZoom(your_location, 17.0f));
+
+                getNearbyStore(locationResult.getLastLocation());
             }
 
             @Override
@@ -88,6 +108,31 @@ public class NearbyStore extends FragmentActivity implements OnMapReadyCallback 
                 Log.d("LocationAvailability", locationAvailability.toString());
             }
         };
+    }
+
+    private void getNearbyStore(Location lastLocation) {
+        compositeDisposable.add(mService.getNearbyStore(String.valueOf(lastLocation.getLatitude()),String.valueOf(lastLocation.getLongitude()))
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeOn(Schedulers.io())
+        .subscribe(new Consumer<List<Store>>() {
+            @Override
+            public void accept(List<Store> stores) throws Exception {
+                for(Store store:stores){
+                    LatLng storeLocation = new LatLng(store.getLat(),store.getLng());
+
+                    mMap.addMarker(new MarkerOptions()
+                    .position(storeLocation)
+                    .title(store.getName())
+                    .snippet(new StringBuilder("Distance:").append(store.getDistance_in_km()).append(" km").toString())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
+                }
+            }
+        }, new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Exception {
+                Log.d("ERRORnearbyStore", throwable.getMessage());
+            }
+        }));
     }
 
     private void buildLocationRequest() {
@@ -121,6 +166,7 @@ public class NearbyStore extends FragmentActivity implements OnMapReadyCallback 
     @Override
     protected void onStop() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        compositeDisposable.clear();
         super.onStop();
     }
 
